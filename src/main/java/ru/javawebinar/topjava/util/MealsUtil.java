@@ -2,6 +2,7 @@ package ru.javawebinar.topjava.util;
 
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.model.MealTo;
+import ru.javawebinar.topjava.storage.StorageInMemory;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -21,8 +22,23 @@ import static java.util.stream.Collectors.toList;
 import static ru.javawebinar.topjava.util.TimeUtil.isBetweenHalfOpen;
 
 public class MealsUtil {
+    public static List<Meal> meals;
+    public final static int CALORIES_PER_DAY = 2000;
+    public static StorageInMemory storageInMemory = new StorageInMemory();
+
+
+    static {
+        storageInMemory.save(new Meal(LocalDateTime.of(2020, Month.JANUARY, 30, 10, 0), "Завтрак", 500));
+        storageInMemory.save(new Meal(LocalDateTime.of(2020, Month.JANUARY, 30, 13, 0), "Обед", 1000));
+        storageInMemory.save(new Meal(LocalDateTime.of(2020, Month.JANUARY, 30, 20, 0), "Ужин", 500));
+        storageInMemory.save(new Meal(LocalDateTime.of(2020, Month.JANUARY, 31, 0, 0), "Еда на граничное значение", 100));
+        storageInMemory.save(new Meal(LocalDateTime.of(2020, Month.JANUARY, 31, 10, 0), "Завтрак", 1000));
+        storageInMemory.save(new Meal(LocalDateTime.of(2020, Month.JANUARY, 31, 13, 0), "Обед", 500));
+        storageInMemory.save(new Meal(LocalDateTime.of(2020, Month.JANUARY, 31, 20, 0), "Ужин", 410));
+    }
+
     public static void main(String[] args) throws ExecutionException, InterruptedException {
-        List<Meal> meals = Arrays.asList(
+        meals = Arrays.asList(
                 new Meal(LocalDateTime.of(2020, Month.JANUARY, 30, 10, 0), "Завтрак", 500),
                 new Meal(LocalDateTime.of(2020, Month.JANUARY, 30, 13, 0), "Обед", 1000),
                 new Meal(LocalDateTime.of(2020, Month.JANUARY, 30, 20, 0), "Ужин", 500),
@@ -32,17 +48,19 @@ public class MealsUtil {
                 new Meal(LocalDateTime.of(2020, Month.JANUARY, 31, 20, 0), "Ужин", 410)
         );
 
+
+        System.out.println("----");
         final LocalTime startTime = LocalTime.of(7, 0);
         final LocalTime endTime = LocalTime.of(12, 0);
 
-        List<MealTo> mealsTo = filteredByStreams(meals, startTime, endTime, 2000);
+        List<MealTo> mealsTo = filteredByStreams(meals, startTime, endTime, CALORIES_PER_DAY);
         mealsTo.forEach(System.out::println);
 
-        System.out.println(filteredByCycles(meals, startTime, endTime, 2000));
+        System.out.println(filteredByCycles(meals, startTime, endTime, CALORIES_PER_DAY));
 
 // Optional2 recursion
-        System.out.println(filteredByRecursion(meals, startTime, endTime, 2000));
-        System.out.println(filteredBySetterRecursion(meals, startTime, endTime, 2000));
+        System.out.println(filteredByRecursion(meals, startTime, endTime, CALORIES_PER_DAY));
+        System.out.println(filteredBySetterRecursion(meals, startTime, endTime, CALORIES_PER_DAY));
 
 //  Optional2 reference type
 //        System.out.println(filteredByAtomic(meals, startTime, endTime, 2000));  // or Boolean[1]
@@ -50,15 +68,35 @@ public class MealsUtil {
 
 //   Optional2 delayed execution
 //      System.out.println(filteredByClosure(meals, startTime, endTime, 2000));
-        System.out.println(filteredByExecutor(meals, startTime, endTime, 2000));
-        System.out.println(filteredByLock(meals, startTime, endTime, 2000));
-        System.out.println(filteredByCountDownLatch(meals, startTime, endTime, 2000));
-        System.out.println(filteredByPredicate(meals, startTime, endTime, 2000));
-        System.out.println(filteredByConsumerChain(meals, startTime, endTime, 2000));
+        System.out.println(filteredByExecutor(meals, startTime, endTime, CALORIES_PER_DAY));
+        System.out.println(filteredByLock(meals, startTime, endTime, CALORIES_PER_DAY));
+        System.out.println(filteredByCountDownLatch(meals, startTime, endTime, CALORIES_PER_DAY));
+        System.out.println(filteredByPredicate(meals, startTime, endTime, CALORIES_PER_DAY));
+        System.out.println(filteredByConsumerChain(meals, startTime, endTime, CALORIES_PER_DAY));
 
 //   Optional2 streams
-        System.out.println(filteredByFlatMap(meals, startTime, endTime, 2000));
-        System.out.println(filteredByCollector(meals, startTime, endTime, 2000));
+        System.out.println(filteredByFlatMap(meals, startTime, endTime, CALORIES_PER_DAY));
+        System.out.println(filteredByCollector(meals, startTime, endTime, CALORIES_PER_DAY));
+    }
+
+    public static List<MealTo> createMealsTo(List<Meal> meals) {
+        Map<LocalDate, Integer> caloriesSumByDate = meals.stream()
+                .collect(
+                        Collectors.groupingBy(Meal::getDate, Collectors.summingInt(Meal::getCalories))
+//                      Collectors.toMap(Meal::getDate, Meal::getCalories, Integer::sum)
+                );
+        return meals.stream()
+                .map(meal -> createToWithId(meal, caloriesSumByDate.get(meal.getDate()) > CALORIES_PER_DAY))
+                .collect(Collectors.toList());
+    }
+
+    public static MealTo createMealTo(List<Meal> meals, Meal meal) {
+        Map<LocalDate, Integer> caloriesSumByDate = meals.stream()
+                .collect(
+                        Collectors.groupingBy(Meal::getDate, Collectors.summingInt(Meal::getCalories))
+//                      Collectors.toMap(Meal::getDate, Meal::getCalories, Integer::sum)
+                );
+        return createToWithId(meal, (caloriesSumByDate.get(meal.getDate()) > CALORIES_PER_DAY));
     }
 
     public static List<MealTo> filteredByStreams(List<Meal> meals, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
@@ -287,7 +325,8 @@ public class MealsUtil {
     public static List<MealTo> filteredByConsumerChain(List<Meal> meals, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
         Map<LocalDate, Integer> caloriesPerDays = new HashMap<>();
         List<MealTo> result = new ArrayList<>();
-        Consumer<Void> consumer = dummy -> {};
+        Consumer<Void> consumer = dummy -> {
+        };
 
         for (Meal meal : meals) {
             caloriesPerDays.merge(meal.getDate(), meal.getCalories(), Integer::sum);
@@ -347,5 +386,9 @@ public class MealsUtil {
 
     private static MealTo createTo(Meal meal, boolean excess) {
         return new MealTo(meal.getDateTime(), meal.getDescription(), meal.getCalories(), excess);
+    }
+
+    private static MealTo createToWithId(Meal meal, boolean excess) {
+        return new MealTo(meal.getId(), meal.getDateTime(), meal.getDescription(), meal.getCalories(), excess);
     }
 }
