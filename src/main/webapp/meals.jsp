@@ -22,23 +22,22 @@
             <th></th>
             <th></th>
         </tr>
-        <c:forEach items="${meals}" var ="meal">
-        <jsp:useBean id="meal" type="ru.javawebinar.topjava.model.MealTo"/>
-<tr>
-    <td><%=TimeUtil.localDateTimeToHtml(meal.getDateTime())%></td>
-    <td>${meal.description}</td>
-    <td><c:choose>
-        <c:when test="${meal.excess == true}">
-            <font color="red">${meal.calories}</font>
-        </c:when>
-        <c:otherwise>
-        <font color="green">${meal.calories}</font>
-        </c:otherwise>
-    </c:choose></td>
-    <td><a href="meals?id=${meal.id}&action=update"><img src="img/pencil.png"></a></td>
-    <td><a href="meals?id=${meal.id}&action=delete"><img src="img/delete.png"></a></td>
-</tr>
-    </c:forEach>
+        <c:forEach items="${meals}" var="meal">
+            <jsp:useBean id="meal" type="ru.javawebinar.topjava.model.MealTo"/>
+            <tr>
+                <td>
+                    <span style="color: ${meal.excess ? "red":  "green"};"><%=TimeUtil.localDateTimeToHtml(meal.getDateTime())%></span>
+                </td>
+                <td>
+                    <span style="color: ${meal.excess ? "red":  "green"};">${meal.description}</span>
+                </td>
+                <td>
+                    <span style="color: ${meal.excess ? "red":  "green"};">${meal.calories}</span>
+                </td>
+                <td><a href="meals?id=${meal.id}&action=update">Update</a></td>
+                <td><a href="meals?id=${meal.id}&action=delete">Delete</a></td>
+            </tr>
+        </c:forEach>
     </table>
 </section>
 

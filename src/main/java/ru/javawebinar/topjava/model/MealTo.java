@@ -1,31 +1,13 @@
 package ru.javawebinar.topjava.model;
 
-import ru.javawebinar.topjava.util.TimeUtil;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
-public class MealTo implements Comparable<MealTo> {
+public class MealTo {
     private String id;
     private final LocalDateTime dateTime;
-
     private final String description;
-
     private final int calories;
-    public final static MealTo EMPTY;
-
-    static {
-        EMPTY = new MealTo(TimeUtil.EMPTY, "", 0, false);
-        EMPTY.setId(null);
-    }
-
-    //    private final AtomicBoolean excess;      // or Boolean[1],  filteredByAtomic
-//    private final Boolean excess;            // filteredByReflection
-//    private final Supplier<Boolean> excess;  // filteredByClosure
     private boolean excess;
-
-    public MealTo(LocalDateTime dateTime, String description, int calories, boolean excess) {
-        this(UUID.randomUUID().toString(), dateTime, description, calories, excess);
-    }
 
     public MealTo(String id, LocalDateTime dateTime, String description, int calories, boolean excess){
         this.id = id;
@@ -34,17 +16,6 @@ public class MealTo implements Comparable<MealTo> {
         this.calories = calories;
         this.excess = excess;
     }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getId() {
-        return id;
-    }
-//    public Boolean getExcess() {
-//        return excess.get();
-//    }
 
     @Override
     public boolean equals(Object o) {
@@ -70,7 +41,14 @@ public class MealTo implements Comparable<MealTo> {
         return result;
     }
 
-    // for filteredBySetterRecursion
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getId() {
+        return id;
+    }
+
     public void setExcess(boolean excess) {
         this.excess = excess;
     }
@@ -99,12 +77,5 @@ public class MealTo implements Comparable<MealTo> {
                 ", calories=" + calories +
                 ", excess=" + excess +
                 '}';
-    }
-
-    @Override
-    public int compareTo(MealTo o) {
-        return dateTime.compareTo(o.dateTime) != 0 ? dateTime.compareTo(o.dateTime) :
-                description.compareTo(o.description) != 0 ? description.compareTo(o.description) :
-                        calories > o.calories ? 1 : -1;
     }
 }

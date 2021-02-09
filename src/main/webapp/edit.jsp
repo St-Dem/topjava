@@ -1,11 +1,10 @@
-<%@ page import="ru.javawebinar.topjava.model.MealTo" %>
-<%@ page import="ru.javawebinar.topjava.util.TimeUtil" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <link rel="stylesheet" href="css/style.css">
     <title>Edit meal</title>
 </head>
 <body>
@@ -19,8 +18,7 @@
         <dl>
             <dt>DateTime</dt>
             <dd>
-                <input type="datetime" name="dateTime" size=150
-                       value="<%=TimeUtil.localDateTimeToHtml(meal.getDateTime())%>">
+                <input type="datetime-local" name="dateTime" size="100" value="${meal.dateTime}">
             </dd>
             <dd>
             <dt>Description</dt>
@@ -30,15 +28,15 @@
             </dd>
             <dt>Calories</dt>
             <dd>
-                <input type="text" name="calories" size=100
+                <input type="number" name="calories" size=100
                        value="${meal.calories}">
             </dd>
 
         </dl>
 
-    <button type="submit">Save</button>
-    <button type="reset">Cancel</button>
-    <button onclick="location.href = 'http://localhost:8080/topjava/meals';" id="myButton" class="float-left submit-button" >Back</button>
+        <button type="submit">Save</button>
+        <button type="reset">Cancel</button>
+        <button onclick="history.back()">Back</button>
     </form>
 </section>
 
