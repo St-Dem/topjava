@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
-
 public class Meal {
     private String id;
     private final LocalDateTime dateTime;

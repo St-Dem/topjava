@@ -11,7 +11,7 @@
 <h3><a href="index.html">Home</a></h3>
 <hr>
 <h2>Edit meal</h2>
-<jsp:useBean id="meal" type="ru.javawebinar.topjava.model.MealTo" scope="request"/>
+<jsp:useBean id="meal" type="ru.javawebinar.topjava.model.Meal" scope="request"/>
 <section>
     <form method="post" action="meals" enctype="application/x-www-form-urlencoded">
         <input type="hidden" name="id" value="${meal.id}">
