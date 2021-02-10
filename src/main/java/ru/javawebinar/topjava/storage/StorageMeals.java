@@ -2,7 +2,10 @@ package ru.javawebinar.topjava.storage;
 
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.model.MealTo;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,8 +28,8 @@ public class StorageMeals implements Storage {
         storageMeals.create(LocalDateTime.of(2020, Month.JANUARY, 31, 13, 0), "Обед", 500);
         storageMeals.create(LocalDateTime.of(2020, Month.JANUARY, 31, 20, 0), "Ужин", 410);
 
-        EMPTY_MEAL = new Meal(null, LocalDateTime.now(), "", 0);
-        EMPTY_MEALTO = new MealTo(null, LocalDateTime.now(), "", 0, false);
+        EMPTY_MEAL = new Meal(null, LocalDateTime.of(LocalDate.now(), LocalTime.of(0, 0)), "", 0);
+        EMPTY_MEALTO = new MealTo(null, LocalDateTime.of(LocalDate.now(), LocalTime.of(0, 0)), "", 0, false);
     }
 
     public void update(Meal meal) {
