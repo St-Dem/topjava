@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class StorageMeals implements Storage {
+public class InMemoryMealStorage implements MealStorage {
     private Map<String, Meal> map = new ConcurrentHashMap<>();
 
     public Meal update(Meal meal) {
