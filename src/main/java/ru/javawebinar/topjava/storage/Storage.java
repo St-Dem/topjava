@@ -6,9 +6,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface Storage {
-    void update(Meal meal);
+    Meal update(Meal meal);
 
-    Meal create(LocalDateTime dateTime, String description, int calories);
+    Meal create(Meal meal);
 
     Meal get(String id);
 

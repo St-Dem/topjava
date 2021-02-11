@@ -13,7 +13,7 @@
 <hr>
 <h2>Meals</h2>
 <section>
-    <a href="meals?uuid=${meal.id}&action=add">Add Meal</a>
+    <a href="meals?id=${meal.id}&action=add">Add Meal</a>
     <table border="1" cellpadding="8" cellspacing="0" style="margin: auto">
         <tr>
             <th>Date</th>
