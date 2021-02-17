@@ -3,15 +3,17 @@ package ru.javawebinar.topjava.repository.inmemory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
-import ru.javawebinar.topjava.model.Meal;
+import ru.javawebinar.topjava.model.AbstractNamedEntity;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.UserRepository;
-import ru.javawebinar.topjava.util.MealsUtil;
-
-import java.lang.reflect.Array;
-import java.util.*;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Repository
 public class InMemoryUserRepository implements UserRepository {
@@ -45,23 +47,15 @@ public class InMemoryUserRepository implements UserRepository {
     @Override
     public List<User> getAll() {
         log.info("getAll");
-        List<User> list = new ArrayList<>(repository.values());
-        list.sort(new NameComparator());
-        return list;
+        return repository.values().stream()
+                .sorted(Comparator.comparing((Function<User, String>) AbstractNamedEntity::getName).thenComparing(User::getEmail))
+                .collect(Collectors.toList());
     }
 
     @Override
     public User getByEmail(String email) {
         log.info("getByEmail {}", email);
-        Optional<User> first = repository.values().stream().filter(user -> user.getEmail().equals(email)).findFirst();
+        Optional<User> first = repository.values().stream().filter(user -> user.getEmail().toLowerCase().equals(email.toLowerCase())).findFirst();
         return first.orElse(null);
-    }
-
-    static class NameComparator implements Comparator<User> {
-        @Override
-        public int compare(User o1, User o2) {
-            int i = o1.getName().compareTo(o2.getName());
-            return i == 0 ? o1.getEmail().compareTo(o2.getEmail()) : i;
-        }
     }
 }
