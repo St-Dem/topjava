@@ -62,7 +62,8 @@ public class InMemoryMealRepository implements MealRepository {
 
     @Override
     public List<Meal> getAll(int userId) {
-      return getMealMap(userId).values().stream()
+        List<Meal> collect = new ArrayList<>(getMealMap(userId).values());
+        return collect.isEmpty() ? Collections.EMPTY_LIST : collect.stream()
                 .sorted(Comparator.comparing(Meal::getDateTime).reversed())
                 .collect(Collectors.toList());
     }
