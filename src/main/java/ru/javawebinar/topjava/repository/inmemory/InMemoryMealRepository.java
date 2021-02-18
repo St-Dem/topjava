@@ -2,6 +2,7 @@ package ru.javawebinar.topjava.repository.inmemory;
 
 import org.springframework.stereotype.Repository;
 import ru.javawebinar.topjava.model.Meal;
+import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.MealRepository;
 import ru.javawebinar.topjava.util.MealsUtil;
 import ru.javawebinar.topjava.web.SecurityUtil;
@@ -20,16 +21,10 @@ public class InMemoryMealRepository implements MealRepository {
 
 
     {
-        for (Meal meal : MealsUtil.meals) {
-            meal.setId(counter.incrementAndGet());
-            repository.put(meal.getId(), meal);
-        }
-        allMeals.put(SecurityUtil.authUserId(), repository);
+        allMeals.put(1, repository);
+        MealsUtil.meals.forEach(x -> save(1, x));
+        allMeals.put(1, repository);
         repository = new ConcurrentHashMap<>();
-        for(int i = 0; i < MealsUtil.meals.size(); i = i+2){
-            repository.put(MealsUtil.meals.get(i).getId(), MealsUtil.meals.get(i));
-        }
-        allMeals.put(10, repository);
     }
 
     @Override
@@ -67,8 +62,8 @@ public class InMemoryMealRepository implements MealRepository {
 
     @Override
     public List<Meal> getAll(int userId) {
-        return getMealMap(userId).values().stream()
-                .sorted((m1, m2) -> m1.getDateTime().compareTo(m2.getDateTime()) * -1)
+      return getMealMap(userId).values().stream()
+                .sorted(Comparator.comparing(Meal::getDateTime).reversed())
                 .collect(Collectors.toList());
     }
 

@@ -13,12 +13,15 @@ import ru.javawebinar.topjava.util.DateTimeUtil;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import static ru.javawebinar.topjava.util.MealsUtil.createTo;
 import static ru.javawebinar.topjava.util.ValidationUtil.assureIdConsistent;
 import static ru.javawebinar.topjava.util.ValidationUtil.checkNew;
 
 @Controller
 public class MealRestController {
-    protected final Logger log = LoggerFactory.getLogger(getClass());
+    private final Logger log = LoggerFactory.getLogger(getClass());
 
     @Autowired
     private MealService service;
@@ -30,9 +33,17 @@ public class MealRestController {
 
     public List<MealTo> getAllSorted(LocalDate startDate, LocalTime startTime, LocalDate endDate, LocalTime endTime) {
         log.info("getAllSorted");
-        return MealsUtil.filterByPredicate(service.getAll(SecurityUtil.authUserId()),
-                MealsUtil.DEFAULT_CALORIES_PER_DAY, meal -> (DateTimeUtil.isBetweenHalfOpen(meal.getTime(), startTime, endTime)
-                        && DateTimeUtil.isBetweenDateHalfOpen(meal.getDate(), startDate, endDate)));
+        Map<LocalDate, Integer> caloriesSumByDate = service.getAll(SecurityUtil.authUserId()).stream()
+                .filter(meal -> DateTimeUtil.isBetweenDateHalfOpen(meal.getDate(), startDate, endDate))
+                .collect(
+                        Collectors.groupingBy(Meal::getDate, Collectors.summingInt(Meal::getCalories))
+                );
+
+        return service.getAll(SecurityUtil.authUserId()).stream()
+                .filter(meal -> (DateTimeUtil.isBetweenHalfOpen(meal.getTime(), startTime, endTime)
+                        && DateTimeUtil.isBetweenDateHalfOpen(meal.getDate(), startDate, endDate)))
+                .map(meal -> createTo(meal, caloriesSumByDate.get(meal.getDate()) > MealsUtil.DEFAULT_CALORIES_PER_DAY))
+                .collect(Collectors.toList());
     }
 
     public Meal get(int id) {

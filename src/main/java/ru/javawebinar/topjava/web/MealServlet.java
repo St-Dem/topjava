@@ -19,7 +19,6 @@ public class MealServlet extends HttpServlet {
     private static final Logger log = LoggerFactory.getLogger(MealServlet.class);
     private MealRepository repository;
 
-
     @Override
     public void init() {
         repository = new InMemoryMealRepository();
