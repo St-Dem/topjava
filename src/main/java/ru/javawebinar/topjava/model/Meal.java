@@ -12,12 +12,15 @@ public class Meal extends AbstractBaseEntity {
 
     private int calories;
 
-    public Meal(LocalDateTime dateTime, String description, int calories) {
-        this(null, dateTime, description, calories);
+    public Meal() {
     }
 
-    public Meal() {
-        this(null, LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES), "", 0);
+    public Meal (Meal meal){
+        this(meal.getId(), meal.getDateTime(), meal.getDescription(), meal.getCalories());
+    }
+
+    public Meal(LocalDateTime dateTime, String description, int calories) {
+        this(null, dateTime, description, calories);
     }
 
     public Meal(Integer id, LocalDateTime dateTime, String description, int calories) {

@@ -63,7 +63,7 @@ public class JdbcMealRepository implements MealRepository {
 
     @Override
     public Meal get(int id, int userId) {
-        List<Meal> meals = jdbcTemplate.query(" SELECT * FROM meals WHERE id=?", ROW_MAPPER, id);
+        List<Meal> meals = jdbcTemplate.query(" SELECT id, datetime, calories, description FROM meals WHERE user_id=?", ROW_MAPPER, userId);
         return DataAccessUtils.singleResult(meals);
     }
 
@@ -79,7 +79,7 @@ public class JdbcMealRepository implements MealRepository {
     }
 
     public List<Meal> filterList(Predicate<Meal> filter, int userId) {
-        List<Meal> meals = jdbcTemplate.query(" SELECT * FROM meals WHERE user_id=?", ROW_MAPPER, userId);
+        List<Meal> meals = jdbcTemplate.query(" SELECT id, datetime, calories, description FROM meals WHERE user_id=?", ROW_MAPPER, userId);
         return meals.stream()
                 .filter(filter)
                 .collect(Collectors.toList());
