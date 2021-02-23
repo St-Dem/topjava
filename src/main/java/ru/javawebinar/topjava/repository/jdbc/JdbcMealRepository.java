@@ -40,9 +40,9 @@ public class JdbcMealRepository implements MealRepository {
     @Override
     public Meal save(Meal meal, int userId) {
         MapSqlParameterSource map = new MapSqlParameterSource()
-                .addValue("id", meal.getId())
                 .addValue("user_id", userId)
-                .addValue("datetime", meal.getDateTime())
+                .addValue("id", meal.getId())
+                .addValue("dateTime", meal.getDateTime())
                 .addValue("description", meal.getDescription())
                 .addValue("calories", meal.getCalories());
 
@@ -50,7 +50,7 @@ public class JdbcMealRepository implements MealRepository {
             Number newKey = insertMeal.executeAndReturnKey(map);
             meal.setId(newKey.intValue());
         } else if (namedParameterJdbcTemplate.update(
-                "UPDATE meals SET datetime=:datetime, description=:description, calories=:calories" +
+                "UPDATE meals SET dateTime=:dateTime, description=:description, calories=:calories" +
                         " WHERE id=:id", map) == 0) {return null;}
         return meal;
     }
@@ -58,19 +58,18 @@ public class JdbcMealRepository implements MealRepository {
     @Override
     public boolean delete(int id, int userId) {
         return jdbcTemplate.update(" DELETE FROM meals WHERE  id=?", id) != 0;
-
     }
 
     @Override
     public Meal get(int id, int userId) {
-        List<Meal> meals = jdbcTemplate.query(" SELECT id, datetime, calories, description FROM meals WHERE user_id=?", ROW_MAPPER, userId);
+        List<Meal> meals = jdbcTemplate.query(" SELECT * FROM meals WHERE user_id=?", ROW_MAPPER, userId);
         return DataAccessUtils.singleResult(meals);
     }
 
     @Override
     public List<Meal> getAll(int userId) {
-        return filterList(meal -> true, userId);
-
+       // return filterList(meal -> true, userId);
+return jdbcTemplate.query(" SELECT * FROM meals WHERE user_id=?", ROW_MAPPER, userId);
     }
 
     @Override
@@ -79,7 +78,7 @@ public class JdbcMealRepository implements MealRepository {
     }
 
     public List<Meal> filterList(Predicate<Meal> filter, int userId) {
-        List<Meal> meals = jdbcTemplate.query(" SELECT id, datetime, calories, description FROM meals WHERE user_id=?", ROW_MAPPER, userId);
+        List<Meal> meals = jdbcTemplate.query(" SELECT * FROM meals WHERE user_id=?", ROW_MAPPER, userId);
         return meals.stream()
                 .filter(filter)
                 .collect(Collectors.toList());
