@@ -1,4 +1,3 @@
-[![Build Status](https://travis-ci.com/St-Dem/topjava.svg?branch=master)](https://travis-ci.com/St-Dem/topjava)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/7bd4fbc270034b97bf99c87ac16ca411)](https://www.codacy.com/gh/St-Dem/topjava/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=St-Dem/topjava&amp;utm_campaign=Badge_Grade)
 [![Build Status](https://travis-ci.com/St-Dem/topjava.svg?branch=master)](https://travis-ci.com/St-Dem/topjava)
 Java Enterprise Online Project 
