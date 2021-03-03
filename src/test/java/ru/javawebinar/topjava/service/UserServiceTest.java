@@ -4,10 +4,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.test.context.junit4.SpringRunner;
+import ru.javawebinar.topjava.Profiles;
 import ru.javawebinar.topjava.UserTestData;
 import ru.javawebinar.topjava.model.Role;
 import ru.javawebinar.topjava.model.User;
@@ -24,6 +26,7 @@ import static ru.javawebinar.topjava.UserTestData.*;
 })
 @RunWith(SpringRunner.class)
 @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
+@ActiveProfiles(resolver = Profiles.ActiveDbProfileResolver.class)
 public class UserServiceTest {
 
     @Autowired
@@ -31,12 +34,12 @@ public class UserServiceTest {
 
     @Test
     public void create() {
+        User created = service.create(getNew());
+        int newId = created.id();
         User newUser = getNew();
-        User created = service.create(newUser);
-        Integer newId = created.getId();
         newUser.setId(newId);
-        assertMatch(created, newUser);
-        assertMatch(service.get(newId), newUser);
+        USER_MATCHER.assertMatch(created, newUser);
+        USER_MATCHER.assertMatch(service.get(newId), newUser);
     }
 
     @Test
@@ -59,7 +62,7 @@ public class UserServiceTest {
     @Test
     public void get() {
         User user = service.get(USER_ID);
-        assertMatch(user, UserTestData.user);
+        USER_MATCHER.assertMatch(user, UserTestData.user);
     }
 
     @Test
@@ -70,19 +73,19 @@ public class UserServiceTest {
     @Test
     public void getByEmail() {
         User user = service.getByEmail("admin@gmail.com");
-        assertMatch(user, admin);
+        USER_MATCHER.assertMatch(user, admin);
     }
 
     @Test
     public void update() {
         User updated = getUpdated();
         service.update(updated);
-        assertMatch(service.get(USER_ID), updated);
+        USER_MATCHER.assertMatch(service.get(USER_ID), getUpdated());
     }
 
     @Test
     public void getAll() {
         List<User> all = service.getAll();
-        assertMatch(all, admin, user);
+        USER_MATCHER.assertMatch(all, admin, user);
     }
 }
