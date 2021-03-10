@@ -1,46 +1,77 @@
 package ru.javawebinar.topjava.service;
 
 import org.junit.Assert;
-import org.junit.Assume;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+<<<<<<<< HEAD:src/test/java/ru/javawebinar/topjava/service/AbstractMealServiceTest.java
+========
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlConfig;
+import org.springframework.test.context.junit4.SpringRunner;
+import ru.javawebinar.topjava.Profiles;
+>>>>>>>> db5a235 (6_02_HW5_profile_test):src/test/java/ru/javawebinar/topjava/service/MealServiceTest.java
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
-import javax.validation.ConstraintViolationException;
 import java.time.LocalDate;
 import java.time.Month;
 
-import static java.time.LocalDateTime.of;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.Assert.assertThrows;
 import static ru.javawebinar.topjava.MealTestData.*;
 import static ru.javawebinar.topjava.UserTestData.ADMIN_ID;
 import static ru.javawebinar.topjava.UserTestData.USER_ID;
 
+<<<<<<<< HEAD:src/test/java/ru/javawebinar/topjava/service/AbstractMealServiceTest.java
 public abstract class AbstractMealServiceTest extends AbstractServiceTest {
+========
+@ContextConfiguration({
+        "classpath:spring/spring-app.xml",
+        "classpath:spring/spring-db.xml"
+})
+@RunWith(SpringRunner.class)
+@Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
+@ActiveProfiles(resolver = Profiles.ActiveDbProfileResolver.class)
+public class MealServiceTest {
+    private static final Logger log = getLogger("result");
+
+    private static final StringBuilder results = new StringBuilder();
+
+    @Rule
+    // http://stackoverflow.com/questions/14892125/what-is-the-best-practice-to-determine-the-execution-time-of-the-bussiness-relev
+    public final Stopwatch stopwatch = new Stopwatch() {
+        @Override
+        protected void finished(long nanos, Description description) {
+            String result = String.format("\n%-25s %7d", description.getMethodName(), TimeUnit.NANOSECONDS.toMillis(nanos));
+            results.append(result);
+            log.info(result + " ms\n");
+        }
+    };
+>>>>>>>> db5a235 (6_02_HW5_profile_test):src/test/java/ru/javawebinar/topjava/service/MealServiceTest.java
 
     @Autowired
-    protected MealService service;
+    private MealService service;
 
     @Test
-    void delete() {
+    public void delete() {
         service.delete(MEAL1_ID, USER_ID);
         assertThrows(NotFoundException.class, () -> service.get(MEAL1_ID, USER_ID));
     }
 
     @Test
-    void deleteNotFound() {
+    public void deleteNotFound() {
         assertThrows(NotFoundException.class, () -> service.delete(NOT_FOUND, USER_ID));
     }
 
     @Test
-    void deleteNotOwn() {
+    public void deleteNotOwn() {
         assertThrows(NotFoundException.class, () -> service.delete(MEAL1_ID, ADMIN_ID));
     }
 
     @Test
-    void create() {
+    public void create() {
         Meal created = service.create(getNew(), USER_ID);
         int newId = created.id();
         Meal newMeal = getNew();
@@ -50,49 +81,49 @@ public abstract class AbstractMealServiceTest extends AbstractServiceTest {
     }
 
     @Test
-    void duplicateDateTimeCreate() {
+    public void duplicateDateTimeCreate() {
         assertThrows(DataAccessException.class, () ->
                 service.create(new Meal(null, meal1.getDateTime(), "duplicate", 100), USER_ID));
     }
 
 
     @Test
-    void get() {
+    public void get() {
         Meal actual = service.get(ADMIN_MEAL_ID, ADMIN_ID);
         MEAL_MATCHER.assertMatch(actual, adminMeal1);
     }
 
     @Test
-    void getNotFound() {
+    public void getNotFound() {
         assertThrows(NotFoundException.class, () -> service.get(NOT_FOUND, USER_ID));
     }
 
     @Test
-    void getNotOwn() {
+    public void getNotOwn() {
         assertThrows(NotFoundException.class, () -> service.get(MEAL1_ID, ADMIN_ID));
     }
 
     @Test
-    void update() {
+    public void update() {
         Meal updated = getUpdated();
         service.update(updated, USER_ID);
         MEAL_MATCHER.assertMatch(service.get(MEAL1_ID, USER_ID), getUpdated());
     }
 
     @Test
-    void updateNotOwn() {
-        NotFoundException exception = assertThrows(NotFoundException.class, () -> service.update(getUpdated(), ADMIN_ID));
-        Assertions.assertEquals("Not found entity with id=" + MEAL1_ID, exception.getMessage());
+    public void updateNotOwn() {
+        NotFoundException exception = assertThrows(NotFoundException.class, () -> service.update(meal1, ADMIN_ID));
+        Assert.assertEquals("Not found entity with id=" + MEAL1_ID, exception.getMessage());
         MEAL_MATCHER.assertMatch(service.get(MEAL1_ID, USER_ID), meal1);
     }
 
     @Test
-    void getAll() {
+    public void getAll() {
         MEAL_MATCHER.assertMatch(service.getAll(USER_ID), meals);
     }
 
     @Test
-    void getBetweenInclusive() {
+    public void getBetweenInclusive() {
         MEAL_MATCHER.assertMatch(service.getBetweenInclusive(
                 LocalDate.of(2020, Month.JANUARY, 30),
                 LocalDate.of(2020, Month.JANUARY, 30), USER_ID),
@@ -100,16 +131,7 @@ public abstract class AbstractMealServiceTest extends AbstractServiceTest {
     }
 
     @Test
-    void getBetweenWithNullDates() {
+    public void getBetweenWithNullDates() {
         MEAL_MATCHER.assertMatch(service.getBetweenInclusive(null, null, USER_ID), meals);
-    }
-
-    @Test
-    public void createWithException() throws Exception {
-        Assume.assumeTrue("Validation not supported (JPA only)", isJpaBased());
-        validateRootCause(ConstraintViolationException.class, () -> service.create(new Meal(null, of(2015, Month.JUNE, 1, 18, 0), "  ", 300), USER_ID));
-        validateRootCause(ConstraintViolationException.class, () -> service.create(new Meal(null, null, "Description", 300), USER_ID));
-        validateRootCause(ConstraintViolationException.class, () -> service.create(new Meal(null, of(2015, Month.JUNE, 1, 18, 0), "Description", 9), USER_ID));
-        validateRootCause(ConstraintViolationException.class, () -> service.create(new Meal(null, of(2015, Month.JUNE, 1, 18, 0), "Description", 5001), USER_ID));
     }
 }
