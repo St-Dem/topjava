@@ -52,7 +52,7 @@ public class MealServiceTest {
 >>>>>>>> db5a235 (6_02_HW5_profile_test):src/test/java/ru/javawebinar/topjava/service/MealServiceTest.java
 
     @Autowired
-    private MealService service;
+    protected MealService service;
 
     @Test
     public void delete() {
