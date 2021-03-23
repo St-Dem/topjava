@@ -7,18 +7,21 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.service.MealService;
+import ru.javawebinar.topjava.to.MealTo;
+
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.Objects;
 
 import static ru.javawebinar.topjava.util.DateTimeUtil.parseLocalDate;
 import static ru.javawebinar.topjava.util.DateTimeUtil.parseLocalTime;
 
 @Controller
-@RequestMapping(value="/meals")
+@RequestMapping(value = "/meals")
 public class JspMealController extends AbstractMealController {
 
     public JspMealController(MealService mealService) {
@@ -56,7 +59,7 @@ public class JspMealController extends AbstractMealController {
                 request.getParameter("description"),
                 Integer.parseInt(request.getParameter("calories")));
         if (request.getParameter("id").isEmpty()) {
-           super.create(meal);
+            super.create(meal);
         } else {
             super.update(meal, getId(request));
         }
@@ -64,12 +67,13 @@ public class JspMealController extends AbstractMealController {
     }
 
     @GetMapping("/filter")
-    public String filter(HttpServletRequest httpServletRequest) {
+    public String filter(HttpServletRequest httpServletRequest, Model model) {
         LocalDate startDate = parseLocalDate(httpServletRequest.getParameter("startDate"));
         LocalDate endDate = parseLocalDate(httpServletRequest.getParameter("endDate"));
         LocalTime startTime = parseLocalTime(httpServletRequest.getParameter("startTime"));
         LocalTime endTime = parseLocalTime(httpServletRequest.getParameter("endTime"));
-        httpServletRequest.setAttribute("meals", getBetween(startDate, startTime, endDate, endTime));
+
+        model.addAttribute("meals", super.getBetween(startDate, startTime, endDate, endTime));
         return "meals";
     }
 
