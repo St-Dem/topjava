@@ -15,6 +15,7 @@ import ru.javawebinar.topjava.util.exception.NotFoundException;
 import ru.javawebinar.topjava.web.AbstractControllerTest;
 import ru.javawebinar.topjava.web.json.JsonUtil;
 
+import java.time.LocalTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -46,7 +47,6 @@ class MealRestControllerTest extends AbstractControllerTest {
                 .andExpect(status().isNoContent());
         assertThrows(NotFoundException.class, () -> mealService.get(MEAL1_ID, USER_ID));
     }
-
 
     @Test
     void update() throws Exception {
@@ -84,16 +84,16 @@ class MealRestControllerTest extends AbstractControllerTest {
         MEAL_MATCHER.assertMatch(mealService.get(newId, USER_ID), newMeal);
     }
 
-
     @Test
     void getBetween() throws Exception {
-        MockHttpServletRequestBuilder addURL = MockMvcRequestBuilders.get(REST_URL_TEST +
-                "filter?startDate=" + "2020-01-30T00:00:00" + "&startTime=" + "2020-01-30T00:00:00" +
-                "&endDate=" + "2020-01-30T15:00:00" + "&endTime=" + "2020-01-30T15:00:00");
-        perform(addURL)
+        perform(MockMvcRequestBuilders.get(REST_URL_TEST + "filter")
+                .contentType(MediaType.APPLICATION_JSON)
+                .param("start", "2020-01-31T00:00:00")
+                .param("end", "2020-01-31T15:00:00"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(MEALTO_MATCHER.contentJson(MealsUtil.getTos(List.of(meal2, meal1), user.getCaloriesPerDay())));
+                .andExpect(MEALTO_MATCHER.contentJson(MealsUtil.getFilteredTos(List.of(meal7, meal6, meal5, meal4),
+                        user.getCaloriesPerDay(), LocalTime.of(00, 00), LocalTime.of(15, 00))));
     }
 }
