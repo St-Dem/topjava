@@ -62,24 +62,7 @@
                 <th></th>
             </tr>
             </thead>
-            <c:forEach items="${meals}" var="meal">
-                <jsp:useBean id="meal" type="ru.javawebinar.topjava.to.MealTo"/>
-                <tr data-mealExcess="${meal.excess}">
-                    <td>
-                            <%--${meal.dateTime.toLocalDate()} ${meal.dateTime.toLocalTime()}--%>
-                            <%--<%=TimeUtil.toString(meal.getDateTime())%>--%>
-                            <%--${fn:replace(meal.dateTime, 'T', ' ')}--%>
-                            ${fn:formatDateTime(meal.dateTime)}
-                    </td>
-                    <td>${meal.description}</td>
-                    <td>${meal.calories}</td>
-                    <td><a><span class="fa fa-pencil"></span></a></td>
-                    <td><a onclick="deleteRow(${meal.id})"><span class="fa fa-remove"></span></a></td>
-                </tr>
-            </c:forEach>
-        </table>
-    </div>
-</div>
+
 
 <div class="modal fade" tabindex="-1" id="editRow">
     <div class="modal-dialog">
@@ -125,5 +108,10 @@
     </div>
 </div>
 <jsp:include page="fragments/footer.jsp"/>
+            <script type="text/javascript">
+                <jsp:include page="fragments/i18nInternationalizationjsp.jsp">
+                <jsp:param name="param" value="meal"/>
+                </jsp:include>
+            </script>
 </body>
 </html>
